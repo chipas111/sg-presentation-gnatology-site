@@ -1031,3 +1031,13 @@ img::selection {
   padding-top: 6em;
   padding-bottom: 6em;
 }
+
+/* --- Stacking cards: convert from BL "slide-away" pattern to true "cover-from-below"
+   sticky pattern. Each card sticks at top of viewport while it's in view; the next
+   card scrolls up from below and overlays the sticky one. Combined with the JS
+   animation being disabled in initStackingCardsParallax (see js/main.js), this
+   gives the "new section covers old section" effect the deck design wants. */
+.stacking-cards__item {
+  position: sticky;
+  top: 0;
+}

@@ -70,6 +70,31 @@ window.lenis = new Lenis({
       if (typeof lenis.resize === "function") lenis.resize();
     });
     scheduleRefresh();
+    // Step 4: refresh ScrollTrigger when lazy images finish loading.
+    // 131/181 <img loading="lazy"> in gnatology have no width/height attributes,
+    // so each one grows the document when it completes. Without an event-driven
+    // refresh, ScrollTrigger holds stale start/end positions and triggers below
+    // fire at the wrong scroll positions — classic "items already at end-state
+    // when the user visually reaches the section" symptom. 200ms debounce
+    // coalesces bursts of loads into one refresh.
+    let _imgRefreshTimer;
+    const refreshOnImage = () => {
+      clearTimeout(_imgRefreshTimer);
+      _imgRefreshTimer = setTimeout(() => {
+        if (typeof lenis.resize === "function") lenis.resize();
+        window.ScrollTrigger.refresh();
+        console.log("[gnatology] ScrollTrigger.refresh fired by lazy-image load");
+      }, 200);
+    };
+    let lazyImgCount = 0;
+    document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+      if (!img.complete) {
+        img.addEventListener("load", refreshOnImage, { once: true });
+        img.addEventListener("error", refreshOnImage, { once: true });
+        lazyImgCount++;
+      }
+    });
+    console.log(`[gnatology] registered load listeners on ${lazyImgCount} lazy images`);
   }
   // -------------------- 1) STICKY FEATURES --------------------
   function initStickyFeatures(root) {
@@ -404,6 +429,11 @@ window.lenis = new Lenis({
       groups.forEach(buildGroupTimeline);
       scheduleRefresh();
     }
+    // Variant of buildAll without scheduleRefresh — for use INSIDE a refresh
+    // event listener, so we don't re-queue another refresh and cause a loop.
+    function rebuildInsideRefresh() {
+      groups.forEach(buildGroupTimeline);
+    }
     buildAll();
     if (!initFlipOnScroll.resizeHandler) {
       let resizeTimer;
@@ -413,6 +443,18 @@ window.lenis = new Lenis({
       };
       window.addEventListener("resize", initFlipOnScroll.resizeHandler);
     }
+    // Rebuild Flip timelines on every ScrollTrigger.refresh().
+    // Reason: each `Flip.fit(target, wrapperN, {duration: D})` tween BAKES the
+    // FROM/TO bounding rects at the moment the tween is created. ScrollTrigger
+    // refresh() updates trigger positions but does NOT re-bake those rects.
+    // After lazy-image refresh shifts layout, the Flip tweens animate between
+    // stale coordinates. Rebuilding the whole timeline on refresh ensures
+    // every Flip.fit re-captures fresh rects. Idempotent: each rebuild kills
+    // the previous timeline first (see buildGroupTimeline header).
+    if (!initFlipOnScroll.refreshHandler) {
+      initFlipOnScroll.refreshHandler = rebuildInsideRefresh;
+      window.ScrollTrigger.addEventListener("refresh", initFlipOnScroll.refreshHandler);
+    }
   }
   // -------------------- 5) IMAGES ON SVG PATH --------------------
   function initImagesOnPathScroll() {
@@ -420,17 +462,30 @@ window.lenis = new Lenis({
     const wraps = document.querySelectorAll('[data-motionpath="wrap"]');
     if (!wraps.length) return;
     initImagesOnPathScroll.timelines = initImagesOnPathScroll.timelines || new WeakMap();
-    wraps.forEach((wrap) => {
+    // Per-wrap builder so we can rebuild on ScrollTrigger.refresh (which fires
+    // when lazy images load and shift layout). MotionPathPlugin caches the
+    // path's bounding box at tween-creation time, and ScrollTrigger.refresh()
+    // does NOT make the plugin re-resolve. Rebuilding the timeline forces a
+    // fresh bbox resolution.
+    //
+    // Why not `invalidateOnRefresh: true` + `onRefresh: invalidate()`? Tried;
+    // it broke the FIRST motionpath. invalidate() on a scrub timeline that's
+    // already played to progress=1 captures the END-state as the new FROM,
+    // so subsequent scrubs animate END→END = no animation, and items appear
+    // stuck at end coordinates before the user reaches the section.
+    const buildWrap = (wrap) => {
       const path = wrap.querySelector('[data-motionpath="path"]');
       const items = wrap.querySelectorAll('[data-motionpath="item"]');
       const itemDetails = wrap.querySelectorAll('[data-motionpath="item-details"]');
       if (!path || !items.length) return;
       gsap.set(items, { zIndex: (i, t, all) => all.length - i });
       const oldTl = initImagesOnPathScroll.timelines.get(wrap);
-      let progress = 0;
       if (oldTl) {
-        progress = oldTl.progress();
+        // Reset items to a clean state before killing — otherwise inline transforms
+        // from the previous tween linger and the new tween captures stale FROM.
         oldTl.progress(0).kill();
+        gsap.set(items, { clearProps: "transform,filter,opacity,visibility" });
+        gsap.set(itemDetails, { clearProps: "transform,opacity,visibility" });
       }
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -451,10 +506,16 @@ window.lenis = new Lenis({
         .fromTo(items, { scale: 0.4 }, { scale: 1, duration: 0.65 }, 0)
         .to(items, { autoAlpha: 0, filter: "blur(1em)", duration: 0.15 }, 0.85)
         .to(itemDetails, { autoAlpha: 0, duration: 0.05 }, 0.9);
-      tl.progress(progress);
       initImagesOnPathScroll.timelines.set(wrap, tl);
-    });
+    };
+    wraps.forEach(buildWrap);
     scheduleRefresh();
+    if (!initImagesOnPathScroll.refreshHandler) {
+      // Rebuild ALL motionpath timelines on each ScrollTrigger.refresh() so the
+      // MotionPath bbox is freshly resolved against the current document.
+      initImagesOnPathScroll.refreshHandler = () => wraps.forEach(buildWrap);
+      window.ScrollTrigger.addEventListener("refresh", initImagesOnPathScroll.refreshHandler);
+    }
     if (!initImagesOnPathScroll.resizeHandler) {
       const debounce = (fn, delay = 200) => {
         let timeout;
@@ -764,6 +825,12 @@ window.lenis = new Lenis({
     const buildContainerTimeline = (container) => {
       const existing = initBackgroundZoom.timelines.get(container);
       if (existing) existing.kill();
+      // If rebuilding (e.g. on resize) make sure we don't leak the previous
+      // refresh-listener — otherwise each resize doubles the listener count.
+      if (container._bgZoomRefitOff) {
+        container._bgZoomRefitOff();
+        container._bgZoomRefitOff = null;
+      }
       const startEl = container.querySelector("[data-bg-zoom-start]");
       const endEl = container.querySelector("[data-bg-zoom-end]");
       const contentEl = container.querySelector("[data-bg-zoom-content]");
@@ -775,7 +842,20 @@ window.lenis = new Lenis({
       const hasRadius = startRadius !== "0px" || endRadius !== "0px";
       contentEl.style.overflow = hasRadius ? "hidden" : "";
       if (hasRadius) gsap.set(contentEl, { borderRadius: startRadius });
+      // Initial fit so contentEl is positioned before the first frame paints.
+      // This captures STALE coords if pin spacers added by sections above shift
+      // startEl's absolute position after init — which is exactly the gnatology
+      // bg-zoom #2 bug. The refreshInit listener below re-runs Flip.fit on every
+      // ScrollTrigger.refresh() so the second instance picks up the corrected
+      // position once the horizontal-scroll pin spacer (~9600px) is in the DOM.
+      // refreshInit fires BEFORE invalidateOnRefresh cascades, so the Flip tween
+      // inside the timeline below re-snapshots its FROM state at the fresh coords.
       window.Flip.fit(contentEl, startEl, { scale: false });
+      const refit = () => window.Flip.fit(contentEl, startEl, { scale: false });
+      window.ScrollTrigger.addEventListener("refreshInit", refit);
+      container._bgZoomRefitOff = () => {
+        window.ScrollTrigger.removeEventListener("refreshInit", refit);
+      };
       const zoomScrollRange = getScrollRange({
         trigger: startEl,
         start: "clamp(top bottom)",
@@ -1133,6 +1213,18 @@ window.lenis = new Lenis({
   function initStackingCardsParallax() {
     if (!has("ScrollTrigger")) return;
     destroyStackingCardsParallax();
+    // In gnatology the design intent is the standard sticky-stacking pattern:
+    // each card sticks at viewport top and the next card scrolls up over it.
+    // That is implemented via CSS (`position: sticky; top: 0` on
+    // .stacking-cards__item, see custom-inline.css). The BL-era GSAP animation
+    // below (which slides the PREVIOUS card down by yPercent +50 and parallaxes
+    // its image upward) conflicts with sticky positioning: GSAP transforms break
+    // out of the sticky context and the card gets pushed down instead of staying
+    // put. Disabling the animation lets pure CSS sticky do its job. Function is
+    // kept (vs. removed from initAll) so any future stacking-cards animations
+    // can be re-enabled here.
+    return;
+    /* eslint-disable */
     const cards = document.querySelectorAll("[data-stacking-cards-item]");
     if (cards.length < 2) return;
     cards.forEach((card, i) => {
