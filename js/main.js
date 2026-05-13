@@ -1405,6 +1405,17 @@ window.lenis = new Lenis({
     safeRun("FlipOnScroll", () => initFlipOnScroll());
     safeRun("ImagesOnPath", () => initImagesOnPathScroll());
     safeRun("RadialTextMarquee", () => initRadialTextMarquee());
+    // LayeredPanels MUST register before HorizontalScrolling. Its 5 pin
+    // triggers add ~779px of extra flow space (last panel's pinSpacing).
+    // Without this ordering, plans-horizontal (which sits BELOW layered-panels
+    // in the DOM) calculates its `start` against a document that's 779px
+    // shorter than reality, then ScrollTrigger.refresh() FAILS to recompute
+    // pinned-trigger start positions reliably — the cached value persists
+    // even with refresh(true). Reordering registration is the only reliable fix.
+    // Verified 2026-05-13: drift goes 779→0 by simply registering layered-panels
+    // before horizontal-scrolling. Other horizontal scrolls (doctors, diplomas)
+    // sit ABOVE layered-panels and aren't affected either way.
+    safeRun("LayeredPanels", () => initLayeredPanels());
     safeRun("HorizontalScrolling", () => initHorizontalScrolling());
     safeRun("BackgroundZoom", () => initBackgroundZoom());
     safeRun("BeforeAfterSplit", () => initBeforeAfterSplitSlider());
@@ -1414,7 +1425,6 @@ window.lenis = new Lenis({
     safeRun("StackingCardsParallax", () => initStackingCardsParallax());
     safeRun("MasonryGrid", () => initMasonryGrid());
     safeRun("StickyStepsBasic", () => initStickyStepsBasic());
-    safeRun("LayeredPanels", () => initLayeredPanels());
     // После всех инитов — один общий refresh
     scheduleRefresh();
     // И ещё один refresh после полной загрузки (шрифты/картинки/AVIF)

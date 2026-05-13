@@ -1041,3 +1041,242 @@ img::selection {
   position: sticky;
   top: 0;
 }
+
+/* --- Slide 12 (стратегия): square/non-wide video. Constrain by viewport
+   HEIGHT instead of container width: the video is sized to 100svh tall,
+   width follows aspect ratio (so a square stays square), and the wrap
+   shrinks to the video's intrinsic size and is flex-centered in the
+   container. .video_hb-wrap keeps its border-radius/overflow:hidden mask. */
+.section-video-clinic.is-viewport-height .container.is-video-clinic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.section-video-clinic.is-viewport-height .video_hb-wrap {
+  width: auto;
+  max-width: 100%;
+  display: inline-block;
+}
+.section-video-clinic.is-viewport-height .video_hb-wrap video {
+  display: block;
+  height: 100svh;
+  max-height: 100svh;
+  width: auto;
+  max-width: 100%;
+}
+
+/* --- Slide 14 (Победы марта): scattered tile layout, mirrors the
+   .ai-tools-section pattern (centered frame + absolutely positioned
+   items inside a relative-positioned logos container). Tiles are
+   white rounded squares with a big number + small uppercase unit
+   label, .ibro label below the card. The .strahovki tile carries a
+   small red circle "2x" SVG badge in its top-right corner.
+   All selectors are new — no existing rule modified. */
+.pobedy-section {
+  background-color: var(--gallery-black);
+}
+.pobedy-frame {
+  width: 90em;
+  max-width: 100%;
+  min-height: 50em;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pobedy-title {
+  width: 30em;
+  max-width: calc(100% - 1em);
+  margin: 0;
+  color: var(--gallery-white);
+  text-align: center;
+}
+.pobedy-tiles {
+  width: 40em;
+  height: 36em;
+  margin-top: 1.5em;
+  position: relative;
+}
+.pobedy-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  /* translateX(-50%) so `left` positions tile CENTER, not its left edge.
+     Without this, tiles with long .ibro labels (wider than card) shift the
+     card away from the intended center. */
+  transform: translateX(-50%);
+}
+.pobedy-tile__card {
+  background-color: var(--gallery-red);
+  color: var(--gallery-white);
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.6em;
+  aspect-ratio: 1 / 1;
+}
+.pobedy-tile__num {
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-size: 2.4em;
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.pobedy-tile__unit {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.6em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.5em;
+  color: var(--gallery-white);
+  opacity: 0.85;
+}
+.pobedy-tile__badge {
+  position: absolute;
+  top: -0.7em;
+  right: -0.7em;
+  width: 1.9em;
+  height: 1.9em;
+  /* White outline ring so the red badge stays visible on a red card. */
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.15em var(--gallery-white);
+}
+.pobedy-tile .ibro {
+  /* tighten .ibro under tile cards (default ai-tool .ibro has 0.75em top) */
+  margin-top: 0.9em;
+  white-space: nowrap;
+}
+
+/* tile size + position variants. `left` value is the CENTER x-coordinate
+   (translateX(-50%) is applied on .pobedy-tile base rule). Frame is 40em
+   wide → centerline at 20em. Cards & nums scaled ~1.5× vs first draft. */
+.pobedy-tile--kreslo {
+  top: 0;
+  left: 20em;
+}
+.pobedy-tile--kreslo .pobedy-tile__card {
+  width: 12em;
+}
+.pobedy-tile--kreslo .pobedy-tile__num {
+  font-size: 4.5em;
+}
+.pobedy-tile--gigieny {
+  top: 14em;
+  left: 6em;
+}
+.pobedy-tile--gigieny .pobedy-tile__card {
+  width: 7.5em;
+}
+.pobedy-tile--gigieny .pobedy-tile__num {
+  font-size: 3em;
+}
+.pobedy-tile--zagruzka {
+  top: 14em;
+  left: 34em;
+}
+.pobedy-tile--zagruzka .pobedy-tile__card {
+  width: 7.5em;
+}
+.pobedy-tile--zagruzka .pobedy-tile__num {
+  font-size: 3em;
+}
+.pobedy-tile--strahovki {
+  top: 25em;
+  left: 20em;
+}
+.pobedy-tile--strahovki .pobedy-tile__card {
+  width: 9em;
+}
+.pobedy-tile--strahovki .pobedy-tile__num {
+  font-size: 3.6em;
+}
+
+/* --- Slide 15 (Кто зарабатывает компании деньги?): black bg, h-h1 title,
+   each role rendered as a filled red pill button (per Figma TZ).
+   Conversion of user-provided design tokens (assuming desktop base 16px):
+     padding 26px 40px → 1.1em 1.65em (with li font-size 1.5em ≈ 24px)
+     font-size 24px    → 1.5em
+     gap 10px          → 0.6em
+     border-radius 999px → 99em (full pill)
+     line-height 90%   → 0.9
+     bg #97001F        → var(--gallery-red)
+   New selectors only. */
+.zaraba-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+}
+.zaraba-list li {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.1em 1.65em;
+  background-color: var(--gallery-red);
+  border-radius: 99em;
+  color: var(--gallery-white);
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-size: 1.5em;
+  font-weight: 400;
+  line-height: 0.9;
+}
+
+/* --- Slides 16-20 horizontal-scroll panels (Планы для врачей → KPI → маркетинг).
+   Built on the recipe-compliant horizontal-gallery wrapper structure
+   (data-horizontal-gallery-wrap / -panel, .horizontal__wrap / __panel / __panel-inner)
+   so initHorizontalScrolling from js/main.js handles the pin + scrub.
+   Inside each panel we use the recipe's .horizontal-gallery-card / __inner / __bg /
+   __bg-img class names, but with a SCOPED `.is-plans-panel` modifier that flips
+   the BL-era "image background, content bottom-left" behavior into
+   "title at top + image below, fully visible, centered". All overrides are
+   nested under `.horizontal-gallery-card.is-plans-panel` — the doctors and
+   diplomas galleries are untouched. */
+.plans-horizontal {
+  background-color: var(--gallery-black);
+}
+.horizontal-gallery-card.is-plans-panel {
+  justify-content: flex-start;
+  align-items: stretch;
+  background-color: transparent;
+  padding: 2em 2.5em;
+  gap: 1.25em;
+}
+.horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__inner {
+  flex: 0 0 auto;
+  width: 100%;
+}
+.horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__inner h1 {
+  margin: 0;
+}
+.horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__bg {
+  /* override base: was position:absolute / inset:0. Here it's a flex item
+     that takes remaining vertical space and centers the contained image. */
+  position: relative;
+  inset: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1em;
+  overflow: hidden;
+}
+.horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__bg-img {
+  /* override base: was width/height 100% + object-fit cover.
+     Here image keeps natural aspect, fits inside the bg slot, centered. */
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
