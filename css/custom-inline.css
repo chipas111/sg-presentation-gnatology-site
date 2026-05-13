@@ -1235,20 +1235,32 @@ img::selection {
    (data-horizontal-gallery-wrap / -panel, .horizontal__wrap / __panel / __panel-inner)
    so initHorizontalScrolling from js/main.js handles the pin + scrub.
    Inside each panel we use the recipe's .horizontal-gallery-card / __inner / __bg /
-   __bg-img class names, but with a SCOPED `.is-plans-panel` modifier that flips
-   the BL-era "image background, content bottom-left" behavior into
-   "title at top + image below, fully visible, centered". All overrides are
-   nested under `.horizontal-gallery-card.is-plans-panel` — the doctors and
-   diplomas galleries are untouched. */
+   __bg-img class names, but with a SCOPED `.is-plans-panel` modifier.
+
+   Design source: Figma file 9yLIk0uX49Uq5WMJqRRdFc, node 7534:1540.
+     - Panel frame 1440×800, title at (77, 68) baseline.
+     - Image frame is a FIXED 1296×500 (aspect ≈ 2.592) anchored at
+       (77, 233). Same on every slide.
+     - Image WITHIN that frame keeps its natural aspect, is pinned
+       to TOP-LEFT of the frame, and scales to fit either by height (500)
+       or by width (1296) — whichever is the constraining dimension for
+       the given image. e.g. slide-19's natural aspect ~5.4:1 means it's
+       width-constrained → renders 1224×227 (rest of the frame is empty).
+     - Title text white. Card background follows section's gallery-black. */
 .plans-horizontal {
   background-color: var(--gallery-black);
 }
 .horizontal-gallery-card.is-plans-panel {
+  /* base rule: justify-content: flex-end, align-items: flex-start,
+     padding: 3em, border-radius: 1.25em. Override to top-stacked layout
+     without the inset rounded-card look. */
   justify-content: flex-start;
   align-items: stretch;
   background-color: transparent;
-  padding: 2em 2.5em;
-  gap: 1.25em;
+  border-radius: 0;
+  padding: 3em 4.8em;
+  gap: 2em;
+  color: var(--gallery-white);
 }
 .horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__inner {
   flex: 0 0 auto;
@@ -1256,27 +1268,509 @@ img::selection {
 }
 .horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__inner h1 {
   margin: 0;
+  color: var(--gallery-white);
 }
 .horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__bg {
-  /* override base: was position:absolute / inset:0. Here it's a flex item
-     that takes remaining vertical space and centers the contained image. */
+  /* override base: was position:absolute/inset:0. Here the image frame
+     is a flow element with fixed aspect-ratio matching Figma's 1296×500.
+     Width fills the available card width (panel - card padding).
+     max-height: 80% guards against very tall viewports where the
+     aspect-derived height would exceed remaining vertical space. */
   position: relative;
   inset: auto;
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 1em;
+  width: 100%;
+  aspect-ratio: 1296 / 500;
+  max-height: 80%;
+  flex: 0 1 auto;
+  display: block;
+  border-radius: 0.75em;
   overflow: hidden;
 }
 .horizontal-gallery-card.is-plans-panel .horizontal-gallery-card__bg-img {
-  /* override base: was width/height 100% + object-fit cover.
-     Here image keeps natural aspect, fits inside the bg slot, centered. */
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
+  /* override base: was object-fit:cover. Here image fills the frame box,
+     keeps natural aspect, is anchored TOP-LEFT (object-position top left),
+     and lets `object-fit: contain` letterbox to the right and/or below
+     when its aspect doesn't match the frame's 2.592 ratio. */
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  object-position: center;
+  object-position: top left;
+}
+
+/* --- Slide 21 (транскриптор): clamp the title block width and center it
+   horizontally in the section. Base `.block-title_content` is text-align:
+   center but has no explicit width, so it spans full section width. Per
+   user spec width=69.25em. Scoped under `.is-transcription` modifier so
+   other .section-video-clinic instances are untouched. */
+.section-video-clinic.is-transcription .block-title_content {
+  width: 69.25em;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- "Работа с отзывами" section: center the title block horizontally
+   in the section. Base `.block-title_content` has `width: 36.25em` without
+   margin auto, so without this override it sits left-aligned in
+   .section-video-clinic. Scoped under `.is-feedback` so plans-horizontal
+   and other section-video-clinic instances are not affected. */
+.section-video-clinic.is-feedback .block-title_content {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- `.books-wrap.is-wide` inside the prompt-black section (the slide with
+   the .book-img.is--contain.sg-video-enlarged.prompt-video on dark bg)
+   should be transparent — base `.books-wrap` has bg `var(--gallery-red)`
+   which doesn't fit the dark prompt-list aesthetic. Scoped via parent
+   class so other .books-wrap.is-wide instances on red bg stay red. */
+.prompt-black-section .books-wrap.is-wide {
+  background-color: transparent;
+}
+
+/* --- Global cap: any `<video class="w-video local-video">` (every Webflow
+   local-video player in the deck — hb, moscow, feedback, max/max-channel,
+   orlov-phone, play-btn, transcription, patients, prompt etc.) cannot
+   exceed viewport height. object-fit: contain preserves aspect when
+   max-height clamps a tall (vertical) video. For wide landscape videos
+   this rule is a no-op (their natural height is below 100svh anyway).
+   Slide-12 strategy clamp (.section-video-clinic.is-viewport-height) has
+   higher specificity and continues to drive its own sizing. */
+.w-video.local-video {
+  max-height: 100svh;
+  object-fit: contain;
+}
+
+/* --- Slide 23 (Конверсия из заявки в запись и приход) — imported from
+   Claude Design bundle 6z6LH3DuDY0E8viBNBjmBA (file "Слайд 23 - Конверсия.html").
+   Two-column funnel + gauge comparison on red bg. All sizes converted from
+   the design's px (1920×1080 fixed) to em (base ~16px) so Osmo Scale System
+   rescales fluidly. Design tokens mapped:
+     --sg-wine    → var(--gallery-red)
+     --sg-white   → var(--gallery-white)
+     "PP Radio Grotesk" → radiogrotesk-variable
+     "JetBrains Mono"   → commons-pro-variable
+   All selectors are new `.conv-*` flat namespace — no collision risk. */
+.section.is-conversion {
+  background-color: var(--gallery-red);
+  color: var(--gallery-white);
+  min-height: 100dvh;
+  display: flex;
+  overflow: hidden;
+}
+.conv-slide {
+  flex: 1 1 auto;
+  width: 100%;
+  padding: 4.5em 6em 3.5em;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  row-gap: 3em;
+  box-sizing: border-box;
+  /* on-wine palette helpers (alpha tints of white for text/lines) */
+  --conv-on: rgba(255, 255, 255, 1);
+  --conv-on-2: rgba(255, 255, 255, 0.72);
+  --conv-on-3: rgba(255, 255, 255, 0.5);
+  --conv-on-line: rgba(255, 255, 255, 0.22);
+  --conv-on-line-strong: rgba(255, 255, 255, 0.6);
+  --conv-bar-track: rgba(255, 255, 255, 0.14);
+  --conv-bar-fill: rgba(255, 255, 255, 0.95);
+}
+
+/* Title */
+.conv-title {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 3em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid var(--conv-on-line-strong);
+}
+.conv-title__h {
+  margin: 0;
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 3em;
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  color: var(--gallery-white);
+  max-width: 80em;
+  text-wrap: balance;
+}
+.conv-title__kicker {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.8125em;
+  font-weight: 500;
+  color: var(--conv-on-2);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-align: right;
+  line-height: 1.7;
+  padding-bottom: 0.5em;
+  white-space: nowrap;
+}
+.conv-title__kicker b {
+  color: var(--conv-on);
+  font-weight: 500;
+}
+
+/* Two columns */
+.conv-cols {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 6em;
+  align-items: stretch;
+}
+.conv-divider {
+  background: var(--conv-on-line);
+  width: 1px;
+}
+.conv-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.conv-col__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5em;
+  margin-bottom: 0.5em;
+}
+.conv-col__h {
+  margin: 0;
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 2em;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--gallery-white);
+}
+.conv-col__idx {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.8125em;
+  font-weight: 500;
+  color: var(--conv-on-3);
+  letter-spacing: 0.01em;
+}
+
+/* Status tags */
+.conv-tag {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5625em;
+  padding: 0.5em 0.8125em 0.5em 0.6875em;
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.75em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin-top: 1em;
+}
+.conv-tag__pip {
+  width: 0.5em;
+  height: 0.5em;
+  display: inline-block;
+}
+.conv-tag.is--win {
+  background: #58A022;
+  color: var(--gallery-white);
+}
+.conv-tag.is--win .conv-tag__pip {
+  background: #ffffff;
+}
+.conv-tag.is--work {
+  background: transparent;
+  color: var(--gallery-white);
+  border: 1px solid var(--gallery-white);
+}
+.conv-tag.is--work .conv-tag__pip {
+  background: var(--gallery-white);
+}
+
+/* Funnel stages */
+.conv-stages {
+  margin-top: 1.75em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875em;
+}
+.conv-stage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1.5em;
+}
+.conv-stage__left {
+  min-width: 0;
+}
+.conv-stage__label {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.75em;
+  font-weight: 500;
+  color: var(--conv-on-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.625em;
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+}
+.conv-stage__n {
+  color: var(--conv-on-3);
+}
+.conv-stage__count {
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 2em;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--gallery-white);
+}
+.conv-stage__right {
+  text-align: right;
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.8125em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.55;
+  color: var(--conv-on-2);
+  white-space: nowrap;
+  padding-bottom: 0.5em;
+}
+.conv-stage__cv {
+  color: var(--gallery-white);
+  font-size: 1.077em;
+}
+.conv-stage__vs {
+  display: block;
+  color: var(--conv-on-3);
+  font-size: 0.846em;
+  margin-top: 0.15em;
+}
+
+.conv-bar {
+  margin-top: 0.625em;
+  height: 0.375em;
+  background: var(--conv-bar-track);
+  position: relative;
+}
+.conv-bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--conv-bar-fill);
+}
+
+/* Summary block at the bottom of each column */
+.conv-summary {
+  margin-top: auto;
+  padding-top: 1.75em;
+  border-top: 1px solid var(--conv-on-line-strong);
+}
+.conv-summary__label {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.75em;
+  font-weight: 500;
+  color: var(--conv-on-2);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.conv-summary__past {
+  color: var(--conv-on-3);
+  font-size: 0.917em;
+}
+.conv-summary__past b {
+  color: var(--conv-on-2);
+  font-weight: 500;
+}
+.conv-summary__headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1.5em;
+  margin-bottom: 0.875em;
+}
+.conv-summary__pct {
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 7.5em;
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  color: var(--gallery-white);
+}
+.conv-summary__pct-sign {
+  font-size: 0.467em;
+  letter-spacing: -0.02em;
+  margin-left: 0.04em;
+}
+.conv-summary__delta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375em;
+  padding-bottom: 0.75em;
+}
+.conv-summary__verdict {
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 1.5em;
+  line-height: 1;
+  letter-spacing: -0.015em;
+  color: var(--gallery-white);
+}
+.conv-summary__verdict.is--win::before {
+  content: "↑";
+  margin-right: 0.4em;
+}
+.conv-summary__verdict.is--miss::before {
+  content: "↓";
+  margin-right: 0.4em;
+  color: var(--conv-on-2);
+}
+.conv-summary__desc {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.75em;
+  color: var(--conv-on-2);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+/* Gauge with goal marker */
+.conv-gauge-wrap {
+  position: relative;
+}
+.conv-gauge {
+  position: relative;
+  height: 0.625em;
+  background: var(--conv-bar-track);
+  margin-top: 0.625em;
+}
+.conv-gauge__achieved {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--gallery-white);
+}
+.conv-gauge__achieved.is--win {
+  background: #58A022;
+}
+.conv-gauge__achieved.is--miss {
+  background: #DB7521;
+}
+.conv-gauge__goal {
+  position: absolute;
+  top: -0.625em;
+  bottom: -0.625em;
+  width: 0.125em;
+  background: var(--gallery-white);
+}
+.conv-gauge__goal::after {
+  content: "";
+  position: absolute;
+  top: -0.375em;
+  left: -0.3125em;
+  width: 0.75em;
+  height: 0.375em;
+  background: var(--gallery-white);
+}
+.conv-gauge__labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.6875em;
+  color: var(--conv-on-3);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  margin-top: 0.5em;
+}
+.conv-gauge-goal-label {
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.75em;
+  font-weight: 500;
+  color: var(--gallery-white);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  margin-bottom: 0.5em;
+}
+.conv-gauge-goal-label b {
+  font-family: radiogrotesk-variable, Arial, sans-serif;
+  font-weight: 500;
+  font-size: 1.83em;
+  letter-spacing: -0.01em;
+  margin-left: 0.375em;
+  vertical-align: -0.125em;
+}
+
+/* Footer */
+.conv-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: commons-pro-variable, Arial, sans-serif;
+  font-size: 0.6875em;
+  color: var(--conv-on-3);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+/* --- Slide 25 (Цифровизация в кадровом делопроизводстве): black-bg slide
+   with centered h-h1 title at top, then a row with image (left) + vertical
+   phone-format video (right). Heights are height-svh-driven so widths
+   follow natural aspect. Image is half the height of the video (image
+   is incidental — phone video is the hero). Slide is allowed to slightly
+   exceed viewport height to give title/padding room — section has
+   min-height: 100dvh but no max + no overflow: hidden. */
+.section.is-cifrovisation {
+  background-color: var(--gallery-black);
+  color: var(--gallery-white);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5em 2em;
+  box-sizing: border-box;
+}
+.cifr-slide {
+  width: 100%;
+  max-width: 50em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3em;
+}
+.cifr-title {
+  margin: 0;
+  max-width: 50em;
+  text-align: center;
+  color: var(--gallery-white);
+}
+.cifr-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+  width: 100%;
+}
+.cifr-image,
+.cifr-video {
+  flex: 0 0 auto;
+  border-radius: 1.5em;
+  overflow: hidden;
+  display: block;
+}
+.cifr-image {
+  height: 30svh;
+}
+.cifr-video {
+  height: 80svh;
+}
+.cifr-image img,
+.cifr-video video {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
 }

@@ -686,6 +686,37 @@
         </div>
         <div class="spacer-big"></div>
       </section>
+      <section class="section-video-orlov">
+        <div class="container">
+          <div class="orlov-video-wrap">
+            <div class="w-video w-embed">
+              <video class="w-video local-video" controls playsinline preload="metadata">
+                <source src="videos/orlov-phone.mp4" type="video/mp4">
+                <source src="videos/orlov-phone.webm" type="video/webm">
+                Ваш браузер не поддерживает воспроизведение видео.
+              </video>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="spacer-big"></div>
+        <div class="brand-wrap"><img loading="lazy" src="images/grid.svg" alt="" class="image">
+          <div class="block-title_content">
+            <div class="eyebrow">[ маркетинг ]</div>
+            <h1 class="h-h1">Наш собственный подкаст</h1>
+          </div>
+        </div>
+      </section>
+      <section class="section">
+        <div class="spacer-big"></div>
+        <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
+          <div class="block-title_content">
+            <div class="eyebrow">[ маркетинг ]</div>
+            <h1 class="h-h1">Рилсы с подкаста хорошо залетают</h1>
+          </div>
+        </div>
+      </section>
       <section class="section is-laptop-vid">
         <div class="spacer-big"></div>
         <div class="container is-centered">
@@ -1318,7 +1349,7 @@
           </div>
         </div>
       </section>
-      <section class="section-video-clinic">
+      <section class="section-video-clinic is-feedback">
         <div class="spacer-big"></div>
         <div class="block-title_content">
           <div class="eyebrow">[ стратегия ]</div>
@@ -2117,7 +2148,7 @@
        - width/height → браузер сразу резервирует место под aspect-ratio, layout не "прыгает"
          когда байты картинки приходят. Это устраняет КОРЕНЬ проблемы (document growth),
          а listener — defence-in-depth. -->
-  <section class="horizontal__wrap plans-horizontal" data-horizontal-gallery-wrap data-horizontal-gallery-disable="mobileLandscape">
+  <section class="horizontal__wrap plans-horizontal" data-horizontal-gallery-wrap data-horizontal-gallery-late data-horizontal-gallery-disable="mobileLandscape">
     <div data-horizontal-gallery-panel class="horizontal__panel">
       <div class="horizontal__panel-inner">
         <div class="horizontal-gallery-card is-plans-panel">
@@ -2161,7 +2192,7 @@
             <h1 class="h-h1">Сетки KPI при перевыполнении плана</h1>
           </div>
           <div class="horizontal-gallery-card__bg">
-            <img src="images/slide-19.png" alt="Сетки KPI при перевыполнении плана" width="2940" height="1912" loading="lazy" class="horizontal-gallery-card__bg-img">
+            <img src="images/slide-19.jpg" alt="Сетки KPI при перевыполнении плана" width="2940" height="1912" loading="lazy" class="horizontal-gallery-card__bg-img">
           </div>
         </div>
       </div>
@@ -2170,7 +2201,7 @@
       <div class="horizontal__panel-inner">
         <div class="horizontal-gallery-card is-plans-panel">
           <div class="horizontal-gallery-card__inner">
-            <h1 class="h-h1">Маркетинг + Call Centre</h1>
+            <h1 class="h-h1">Маркетинг + Call Center</h1>
           </div>
           <div class="horizontal-gallery-card__bg">
             <img src="images/slide-20.JPG" alt="Маркетинг и Call Centre" width="1098" height="564" loading="lazy" class="horizontal-gallery-card__bg-img">
@@ -2180,58 +2211,195 @@
     </div>
   </section>
 
-  <!-- новый слайд -->
-  <section class="section">
+  <!-- Слайд 21: транскриптор (заголовок + wide video) -->
+  <section class="section-video-clinic is-transcription">
     <div class="spacer-big"></div>
-    <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-      <div class="block-title_content">
-        <h1 class="h-h1">Видео про транскриптор. СЛОЖИЛА В ПАПКУ, СЛАЙД НАЗВАЛА НОМЕР 21 [стр 27]</h1>
+    <div class="block-title_content">
+      <h1 class="h-h1">Как оцифровать консультации для собственника для удаленного просмотра</h1>
+    </div>
+    <div class="container is-video-clinic">
+      <div class="video_hb-wrap">
+        <div class="w-video w-embed">
+          <video class="w-video local-video" controls playsinline preload="metadata">
+            <source src="videos/slide_transcription.mp4" type="video/mp4">
+          </video>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- новый слайд -->
-  <section class="section">
-    <div class="spacer-big"></div>
-    <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-      <div class="block-title_content">
-        <h1 class="h-h1">Слайд номер 22, если не сложно заблюрь фио пациентов, если сложно то ок 21 [стр 28]</h1>
+  <!-- Слайд 22: пациенты (wide video, без заголовка) -->
+  <section class="section-video-clinic">
+    <div class="container is-video-clinic">
+      <div class="video_hb-wrap">
+        <div class="w-video w-embed">
+          <video class="w-video local-video" controls playsinline preload="metadata">
+            <source src="videos/patients-video.mp4" type="video/mp4">
+          </video>
+        </div>
       </div>
     </div>
   </section>
 
 
-  <!-- новый слайд -->
-  <section class="section">
-    <div class="spacer-big"></div>
-    <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-      <div class="block-title_content">
-        <h1 class="h-h1">      Ежемесячный замер первичных и повторных пациентов Конверсия из заявки в запись и приход [стр 29]</h1>
+  <!-- Слайд 23: Конверсия из заявки в запись и приход (Claude Design import) -->
+  <section class="section is-conversion">
+    <div class="conv-slide">
+      <header class="conv-title">
+        <h1 class="conv-title__h">Конверсия из заявки в запись и приход</h1>
+        <div class="conv-title__kicker">
+          Ежемесячный замер<br>
+          <b>Первичные · Повторные</b>
+        </div>
+      </header>
+
+      <div class="conv-cols">
+        <div class="conv-col">
+          <div class="conv-col__head">
+            <h2 class="conv-col__h">По первичным пациентам</h2>
+            <span class="conv-col__idx">01</span>
+          </div>
+          <span class="conv-tag is--win"><span class="conv-tag__pip"></span>цель достигнута</span>
+
+          <div class="conv-stages">
+            <div class="conv-stage">
+              <div class="conv-stage__left">
+                <div class="conv-stage__label">Обращений</div>
+                <div class="conv-stage__count">142</div>
+                <div class="conv-bar"><span style="width:100%"></span></div>
+              </div>
+            </div>
+            <div class="conv-stage">
+              <div class="conv-stage__left">
+                <div class="conv-stage__label">Запись</div>
+                <div class="conv-stage__count">134</div>
+                <div class="conv-bar"><span style="width:94.4%"></span></div>
+              </div>
+
+            </div>
+            <div class="conv-stage">
+              <div class="conv-stage__left">
+                <div class="conv-stage__label">Явка</div>
+                <div class="conv-stage__count">86</div>
+                <div class="conv-bar"><span style="width:60.6%"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="conv-summary">
+            <div class="conv-summary__headline">
+              <div class="conv-summary__pct">61<span class="conv-summary__pct-sign">%</span></div>
+              <div class="conv-summary__delta">
+                <div class="conv-summary__verdict is--win">+1 п.п. к&nbsp;цели</div>
+                <div class="conv-summary__desc">факт&nbsp;61%&nbsp;·&nbsp;цель&nbsp;60%</div>
+              </div>
+            </div>
+            <div class="conv-gauge-wrap">
+              <div class="conv-gauge-goal-label">Цель <b>60%</b></div>
+              <div class="conv-gauge">
+                <div class="conv-gauge__achieved is--win" style="width:61%"></div>
+                <div class="conv-gauge__goal" style="left:60%"></div>
+              </div>
+              <div class="conv-gauge__labels">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="conv-divider"></div>
+
+        <div class="conv-col">
+          <div class="conv-col__head">
+            <h2 class="conv-col__h">По повторным пациентам</h2>
+            <span class="conv-col__idx">02</span>
+          </div>
+          <span class="conv-tag is--work"><span class="conv-tag__pip"></span>работаем над целью</span>
+
+          <div class="conv-stages">
+            <div class="conv-stage">
+              <div class="conv-stage__left">
+                <div class="conv-stage__label">Обращений</div>
+                <div class="conv-stage__count">336</div>
+                <div class="conv-bar"><span style="width:100%"></span></div>
+              </div>
+            </div>
+            <div class="conv-stage">
+              <div class="conv-stage__left">
+                <div class="conv-stage__label">Запись</div>
+                <div class="conv-stage__count">256</div>
+                <div class="conv-bar"><span style="width:76.2%"></span></div>
+              </div>
+            </div>
+            <div class="conv-stage">
+              <div class="conv-stage__left">
+                <div class="conv-stage__label">Явка</div>
+                <div class="conv-stage__count">189</div>
+                <div class="conv-bar"><span style="width:56.3%"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="conv-summary">
+            <div class="conv-summary__headline">
+              <div class="conv-summary__pct">56<span class="conv-summary__pct-sign">%</span></div>
+              <div class="conv-summary__delta">
+                <div class="conv-summary__verdict is--miss">−17 п.п. к&nbsp;цели</div>
+                <div class="conv-summary__desc">факт&nbsp;56%&nbsp;·&nbsp;цель&nbsp;73%</div>
+              </div>
+            </div>
+            <div class="conv-gauge-wrap">
+              <div class="conv-gauge-goal-label">Цель <b>73%</b></div>
+              <div class="conv-gauge">
+                <div class="conv-gauge__achieved is--miss" style="width:56%"></div>
+                <div class="conv-gauge__goal" style="left:73%"></div>
+              </div>
+              <div class="conv-gauge__labels">
+                <span>0%</span>
+                <span>50%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conv-foot">
+        <span>Замер за май 2026&nbsp;·&nbsp;CRM Smile Gallery</span>
       </div>
     </div>
   </section>
 
   
 
-  <!-- новый слайд -->
-  <section class="section">
-    <div class="spacer-big"></div>
-    <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-      <div class="block-title_content">
-        <h1 class="h-h1">Цифровизация в кадровом делепроизводстве [стр 30]</h1>
+  <!-- Слайд 25: Цифровизация в кадровом делопроизводстве -->
+  <section class="section is-cifrovisation">
+    <div class="cifr-slide">
+      <h1 class="h-h1 cifr-title">Цифровизация в кадровом делопроизводстве</h1>
+      <div class="cifr-row">
+        <div class="cifr-image">
+          <img src="images/moy-kabinet.jpg" alt="Мой кабинет">
+        </div>
+        <div class="cifr-video">
+          <video autoplay loop muted playsinline preload="metadata">
+            <source src="videos/cifrovisation-mob.mp4" type="video/mp4">
+          </video>
+        </div>
       </div>
     </div>
   </section>
 
 
-  
-  <!-- новый слайд -->
   <section class="section">
     <div class="spacer-big"></div>
-    <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-      <div class="block-title_content">
-        <h1 class="h-h1">Цифровизация в документообороте с пациентами [стр 31]</h1>
+    <div class="brand-wrap"><img src="images/grid.svg" loading="lazy" alt="" class="image">
+      <div class="block-title_content is-wide">
+        <div class="eyebrow">[технологии]</div>
+        <h1 class="h-h1">Цифровизация в документообороте с пациентами</h1>
       </div>
+      <img src="images/fdoc.png" alt="">
     </div>
   </section>
   <section class="section-money">
@@ -2267,28 +2435,8 @@
         </div>
         <div class="spacer-big"></div>
       </section>
-      <section class="section-video-orlov">
-        <div class="container">
-          <div class="orlov-video-wrap">
-            <div class="w-video w-embed">
-              <video class="w-video local-video" controls playsinline preload="metadata">
-                <source src="videos/orlov-phone.mp4" type="video/mp4">
-                <source src="videos/orlov-phone.webm" type="video/webm">
-                Ваш браузер не поддерживает воспроизведение видео.
-              </video>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="section">
-        <div class="spacer-big"></div>
-        <div class="brand-wrap"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-          <div class="block-title_content">
-            <div class="eyebrow">[ маркетинг ]</div>
-            <h1 class="h-h1">Наш собственный подкаст</h1>
-          </div>
-        </div>
-      </section>
+ 
+      
       <section class="section-own-podcast">
         <div class="container">
           <div class="sg-social-wrap">
@@ -2298,19 +2446,12 @@
         </div>
         <div class="spacer-big"></div>
       </section>
+ 
 
 
 
 
-      <section class="section">
-        <div class="spacer-big"></div>
-        <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
-          <div class="block-title_content">
-            <div class="eyebrow">[ маркетинг ]</div>
-            <h1 class="h-h1">Рилсы с подкаста хорошо залетают</h1>
-          </div>
-        </div>
-      </section>
+
 
 
 
@@ -2376,15 +2517,11 @@
           </div>
         </div>
       </section>
-
-
-
-  <!-- новый слайд -->
   <section class="section">
-    <div class="spacer-big"></div>
-    <div class="brand-wrap" style="background-color: red;"><img loading="lazy" src="images/grid.svg" alt="" class="image">
+    <div class="brand-wrap"><img src="images/grid.svg" loading="lazy" alt="" class="image">
       <div class="block-title_content">
-        <h1 class="h-h1">Не бывает не выполнимых задач, бывают сердечные приступы в 40 [стр 40]</h1>
+        <div class="eyebrow">[ мудрость ]</div>
+        <h1 class="h-h1">Не бывает не выполнимых задач, бывают сердечные приступы в 40</h1>
       </div>
     </div>
   </section>

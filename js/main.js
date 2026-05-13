@@ -766,7 +766,24 @@ window.lenis = new Lenis({
     });
   }
   // -------------------- 7) HORIZONTAL SCROLL --------------------
-  function initHorizontalScrolling() {
+  function initHorizontalScrolling(mode) {
+    // mode === "early"  → process wrappers WITHOUT data-horizontal-gallery-late
+    // mode === "late"   → process wrappers WITH data-horizontal-gallery-late
+    // mode === undefined → process all (back-compat)
+    //
+    // Reason for split: there are 3 horizontal-scroll wrappers in this deck.
+    // #1 doctors (~line 775) and #2 diplomas (~line 1348) sit ABOVE the
+    // LayeredPanels section (~line 1455) in DOM. #3 plans-horizontal
+    // (~line 2116) sits BELOW it. ScrollTrigger pin triggers cache their
+    // `start` at creation time against the current DOM (i.e. with whichever
+    // pin-spacers already exist). `ScrollTrigger.refresh()` does NOT reset
+    // that cache for pinned triggers. So:
+    //   - LayeredPanels MUST register AFTER horizontals #1 #2 (so its
+    //     `start` accounts for their pin-spacers).
+    //   - Plans-horizontal MUST register AFTER LayeredPanels (so its
+    //     `start` accounts for the 5 layered-panel pin-spacers).
+    // A single linear call can't satisfy both — hence the split here.
+    // See ~/.claude/.../memory/feedback_pin_creating_init_order.md.
     if (!has("ScrollTrigger")) return;
     const mm = gsap.matchMedia();
     mm.add(
@@ -780,7 +797,13 @@ window.lenis = new Lenis({
         const { isMobile, isMobileLandscape, isTablet } = context.conditions;
         const ctx = gsap.context(() => {
           // Accept both BL-era `data-horizontal-scroll-*` and RM-era `data-horizontal-gallery-*` attributes.
-          const wrappers = document.querySelectorAll("[data-horizontal-scroll-wrap], [data-horizontal-gallery-wrap]");
+          const allWrappers = document.querySelectorAll("[data-horizontal-scroll-wrap], [data-horizontal-gallery-wrap]");
+          const wrappers = Array.from(allWrappers).filter((wrap) => {
+            const isLate = wrap.hasAttribute("data-horizontal-gallery-late");
+            if (mode === "early") return !isLate;
+            if (mode === "late") return isLate;
+            return true;
+          });
           if (!wrappers.length) return;
           wrappers.forEach((wrap) => {
             const disable = wrap.getAttribute("data-horizontal-gallery-disable")
@@ -1402,21 +1425,25 @@ window.lenis = new Lenis({
     safeRun("StickyFeatures", () => initStickyFeatures());
     safeRun("StickyTitleScroll", () => initStickyTitleScroll());
     safeRun("3DCarousel", () => init3dImageCarousel());
+    // HorizontalScrolling EARLY: horizontals #1 (doctors ~line 775) and #2
+    // (diplomas ~line 1348) sit ABOVE FlipOnScroll #2 (ProDoctorov ~line 1315),
+    // motionpath sections, and LayeredPanels (~line 1455) in DOM. They MUST
+    // register BEFORE those downstream functions so the pin-spacers are in
+    // the DOM when the downstream triggers cache their `start` positions.
+    // Plans-horizontal (~line 2116) is opted out via `data-horizontal-gallery-late`
+    // and gets registered in the LATE pass after LayeredPanels.
+    safeRun("HorizontalScrollingEarly", () => initHorizontalScrolling("early"));
     safeRun("FlipOnScroll", () => initFlipOnScroll());
     safeRun("ImagesOnPath", () => initImagesOnPathScroll());
     safeRun("RadialTextMarquee", () => initRadialTextMarquee());
-    // LayeredPanels MUST register before HorizontalScrolling. Its 5 pin
-    // triggers add ~779px of extra flow space (last panel's pinSpacing).
-    // Without this ordering, plans-horizontal (which sits BELOW layered-panels
-    // in the DOM) calculates its `start` against a document that's 779px
-    // shorter than reality, then ScrollTrigger.refresh() FAILS to recompute
-    // pinned-trigger start positions reliably — the cached value persists
-    // even with refresh(true). Reordering registration is the only reliable fix.
-    // Verified 2026-05-13: drift goes 779→0 by simply registering layered-panels
-    // before horizontal-scrolling. Other horizontal scrolls (doctors, diplomas)
-    // sit ABOVE layered-panels and aren't affected either way.
+    // LayeredPanels: 5 pin triggers ~5 viewport-heights of scroll-flow.
+    // Registered AFTER HorizontalScrollingEarly so layered's `start` cache
+    // already accounts for horizontals #1 #2 pin-spacers, and BEFORE
+    // HorizontalScrollingLate so plans-horizontal's `start` cache accounts
+    // for layered's own pin-spacers. See feedback_pin_creating_init_order.md
+    // (auto-memory) for the deck-wide pin-order rule.
     safeRun("LayeredPanels", () => initLayeredPanels());
-    safeRun("HorizontalScrolling", () => initHorizontalScrolling());
+    safeRun("HorizontalScrollingLate", () => initHorizontalScrolling("late"));
     safeRun("BackgroundZoom", () => initBackgroundZoom());
     safeRun("BeforeAfterSplit", () => initBeforeAfterSplitSlider());
     safeRun("GlobalParallax", () => initGlobalParallax());
