@@ -45,8 +45,8 @@
   min-width: 12em;
 }
 
-section is-100vh.is--full-black.is--full-black {
-  background-color: #000000;
+.is--full-black {
+  background-color: #000;
 }
 
 .page {
