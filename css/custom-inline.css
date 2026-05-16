@@ -1297,6 +1297,14 @@ img::selection {
   object-position: top left;
 }
 
+.is-ngs {
+  border-radius: 2em;
+  margin: 3em auto;
+  object-fit: contain;
+  width: 100%;
+  max-height: 100%;
+}
+
 /* --- Slide 21 (транскриптор): clamp the title block width and center it
    horizontally in the section. Base `.block-title_content` is text-align:
    center but has no explicit width, so it spans full section width. Per
@@ -1773,4 +1781,70 @@ img::selection {
   width: auto;
   height: 100%;
   max-width: 100%;
+}
+
+/* --- "Рилсы с подкаста хорошо залетают" slide: black-bg slide with the
+   title at top, then a row with image (left) + vertical phone-format
+   video (right). Both media items are 80svh tall — width follows natural
+   aspect (image is near-square, video is vertical). Small gap between.
+   Same family as .cifr-* (slide 25) but both items share one height. */
+.section.is-reels {
+  background-color: var(--gallery-black);
+  color: var(--gallery-white);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5em 2em;
+  box-sizing: border-box;
+}
+.reels-slide {
+  width: 100%;
+  max-width: 100em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3em;
+}
+.reels-head {
+  /* base .block-title_content has width 36.25em w/o margin auto → center it */
+  margin-left: auto;
+  margin-right: auto;
+}
+.reels-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+  width: 100%;
+}
+.reels-image,
+.reels-video {
+  flex: 0 0 auto;
+  border-radius: 1.5em;
+  overflow: hidden;
+  display: block;
+}
+.reels-video {
+  height: 80svh;
+}
+.reels-image {
+  /* ~30% smaller than the video per user request (80svh × 0.7) */
+  height: 56svh;
+}
+.reels-image img,
+.reels-video video {
+  display: block;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+}
+
+/* --- All .section-video-orlov sections → total-black background.
+   Base rule in smile-gallery-presentation.webflow.css sets #1e1e1e
+   (dark gray); this override (custom-inline.css loads after webflow.css)
+   switches every instance to var(--gallery-black) #0e0e0e. Per user
+   request — webflow.css base left untouched. */
+.section-video-orlov {
+  background-color: var(--gallery-black);
 }
